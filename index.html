@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RIGI: Rectifying Image-to-3D Generation Inconsistency via Uncertainty-aware Learning</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag("js", new Date());
+
+    gtag("config", "G-PYVRSFMDRL");
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet" />
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css" />
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css" />
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css" />
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" />
+  <link rel="stylesheet" href="./static/css/index.css" />
+  <link rel="icon" href="./static/images/favicon.svg" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet" />
+
+  <link rel="stylesheet" href="./staticcss/bulma.min.css" />
+  <link rel="stylesheet" href="./staticcss/bulma-carousel.min.css" />
+  <link rel="stylesheet" href="./staticcss/fontawesome.all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" />
+  <link rel="stylesheet" href="./staticcss/index.css" />
+  <link rel="icon" href="./staticimages/test3.png" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script defer src="./staticjs/fontawesome.all.min.js"></script>
+  <script src="./staticjs/bulma-slider.min.js"></script>
+  <script src="./staticjs/index.js"></script>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.1.1/model-viewer.min.js"></script>
+
+  <style>
+    body {
+      margin: auto;
+      font-family: Arial, sans-serif;
+    }
+
+    nav {
+      position: auto;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: ghostwhite;
+      z-index: 100;
+      box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    nav ul {
+      padding: 0;
+      margin: auto;
+      list-style: none;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav ul li {
+      margin: auto;
+    }
+
+    nav ul li a {
+      display: block;
+      padding: 5px;
+      /*      color: #fff;*/
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    nav ul li a:hover {
+      background-color: #555;
+    }
+
+    /* iframe 容器 */
+    .iframe-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* 提示器 */
+    .tooltip {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      padding: 10px;
+      background-color: #333;
+      color: #fff;
+      font-size: 12px;
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+      visibility: visible;
+      opacity: 1;
+      transition: visibility 0.2s, opacity 0.2s;
+    }
+
+    /* 鼠标悬停在 iframe 容器时隐藏提示器 */
+    .iframe-container:hover .tooltip {
+      visibility: hidden;
+      opacity: 0;
+    }
+
+    .title {
+      font-size: 36px;
+    }
+
+    /*  teaser font-size  */
+    .teaserTitle {
+      font-size: 76px;
+    }
+
+    .subTeaserTitle {
+      font-size: 15px;
+    }
+
+    .carousel-indicators {
+      bottom: -26px;
+    }
+
+    .carousel-control.left,
+    .carousel-control.right {
+      background-image: none !important;
+      filter: none !important;
+      width: 20px;
+    }
+
+    .columns {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .column {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .carousel-indicators ol {
+      width: 100%;
+    }
+
+    .carousel-indicators li {
+      height: 3px !important;
+      border-radius: 0px !important;
+      width: 25%;
+    }
+  </style>
+</head>
+
+<body>
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-0 publication-title">
+              RIGI: Rectifying Image-to-3D Generation Inconsistency <br />
+              via Uncertainty-aware Learning
+            </h1>
+
+            <div class="is-size-2 publication-authors">
+              <span class="author-block">Anonymous Submission</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1.2 Abstract -->
+  <section class="hero">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-1">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Given a single image of a target object, image-to-3D generation aims to reconstruct its texture and
+              geometric shape.
+              Recent methods often use intermediate media, such as multi-view images or videos, to bridge the input
+              image and the 3D target, guiding the generation of both shape and texture.
+              However, inconsistencies in the generated multi-view snapshots often introduce noise, artifacts, and
+              errors along object boundaries, undermining the 3D reconstruction process.
+              To address this, we leverage 3D Gaussian Splatting (3DGS), a powerful framework for 3D reconstruction, and
+              integrate uncertainty-aware learning into its process.
+              By leveraging the stochasticity between two Gaussian models, we estimate an uncertainty map, which is then
+              used for uncertainty-aware regularization to reduce the impact of inconsistencies.
+              Specifically, we optimize both Gaussian models simultaneously, calculating the uncertainty map by
+              evaluating the differences between rendered images from identical viewpoints.
+              We then apply adaptive pixel-wise loss weighting during training to regularize the models, reducing
+              reconstruction intensity in high-uncertainty regions.
+              This approach dynamically detects and alleviates conflicts in multi-view labels, producing smoother
+              results and effectively mitigating artifacts.
+              Extensive experiments demonstrate the effectiveness of our method in improving 3D generation quality by
+              reducing inconsistencies and artifacts.
+            </p>
+
+            <br />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <br />
+
+  <!-- 1.3 Pipeline -->
+  <section class="hero">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <h2 class="title is-1">Methodology</h2>
+        <img src="images/pipeline.jpg" width="100%" />
+      </div>
+      <div class="content has-text-justified">
+        <p>
+          Overview of the RIGI pipeline, which takes a reference image as input and produces 3D assets as output.
+          We adopt a two-stage approach, first using a multi-view video diffusion model to generate dense and
+          high-quality frames, which are then served as pseudo-labels to guide 3D asset optimization.
+          Specifically, we first use SV3D to generate multiple videos with a wide range of viewpoints, which serve as
+          pseudo-labels for 3D asset optimization.
+          Next, we introduce uncertainty-aware learning, estimating an uncertainty map by leveraging the stochasticity
+          of two simultaneously optimized Gaussian models.
+          Finally, we apply uncertainty-aware regularization to mitigate the impact of inconsistencies in the generated
+          pseudo-labels, resulting in high-quality and visually impressive 3D assets.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <h2 class="title is-3">It may take a while to load ...</h2>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- 2.1 Visual-Results -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <h2 class="title is-1">Visual Results</h2>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="columns is-mobile is-centered">
+        <div class="rows is-mobile is-centered">
+          <div class="row is-mobile is-centered">
+            <div class="columns is-mobile is-centered">
+
+              <!-- result 1 -->
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Input Image</h5>
+                  <img src="videos/visual_results/input_images/001.png" style="height: 200px; width: 200px" />
+                </div>
+              </div>
+
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Render Video</h5>
+                  <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                    <source src="videos/visual_results/render_videos/001.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+
+              <!-- result 2 -->
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Input Image</h5>
+                  <img src="videos/visual_results/input_images/002.png" style="height: 200px; width: 200px" />
+                </div>
+              </div>
+
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Render Video</h5>
+                  <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                    <source src="videos/visual_results/render_videos/002.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+
+              <!-- result 3 -->
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Input Image</h5>
+                  <img src="videos/visual_results/input_images/003.png" style="height: 200px; width: 200px" />
+                </div>
+              </div>
+
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Render Video</h5>
+                  <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                    <source src="videos/visual_results/render_videos/003.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-mobile is-centered">
+        <div class="rows is-mobile is-centered">
+          <div class="row is-mobile is-centered">
+            <div class="columns is-mobile is-centered">
+
+              <!-- result 4 -->
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Input Image</h5>
+                  <img src="videos/visual_results/input_images/004.png" style="height: 200px; width: 200px" />
+                </div>
+              </div>
+
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Render Video</h5>
+                  <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                    <source src="videos/visual_results/render_videos/004.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+
+              <!-- result 5 -->
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Input Image</h5>
+                  <img src="videos/visual_results/input_images/005.png" style="height: 200px; width: 200px" />
+                </div>
+              </div>
+
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Render Video</h5>
+                  <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                    <source src="videos/visual_results/render_videos/005.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+
+              <!-- result 6 -->
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Input Image</h5>
+                  <img src="videos/visual_results/input_images/006.png" style="height: 200px; width: 200px" />
+                </div>
+              </div>
+
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Render Video</h5>
+                  <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                    <source src="videos/visual_results/render_videos/006.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-mobile is-centered">
+        <div class="rows is-mobile is-centered">
+          <div class="row is-mobile is-centered">
+            <div class="columns is-mobile is-centered">
+
+              <!-- result 7 -->
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Input Image</h5>
+                  <img src="videos/visual_results/input_images/007.png" style="height: 200px; width: 200px" />
+                </div>
+              </div>
+
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Render Video</h5>
+                  <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                    <source src="videos/visual_results/render_videos/007.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+
+              <!-- result 8 -->
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Input Image</h5>
+                  <img src="videos/visual_results/input_images/008.png" style="height: 200px; width: 200px" />
+                </div>
+              </div>
+
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Render Video</h5>
+                  <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                    <source src="videos/visual_results/render_videos/008.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+
+              <!-- result 9 -->
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Input Image</h5>
+                  <img src="videos/visual_results/input_images/009.png" style="height: 200px; width: 200px" />
+                </div>
+              </div>
+
+              <div class="column is-mobile is-centered">
+                <div class="row is-mobile is-centered">
+                  <h5 align="center">Render Video</h5>
+                  <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                    <source src="videos/visual_results/render_videos/009.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="collapseOne" class="panel-collapse collapse in">
+      <div class="panel-body">
+        <div class="container is-max-desktop">
+          <div class="columns is-mobile is-centered">
+            <div class="rows is-mobile is-centered">
+              <div class="row is-mobile is-centered">
+                <div class="columns is-mobile is-centered">
+
+                  <!-- result 10 -->
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Input Image</h5>
+                      <img src="videos/visual_results/input_images/010.png" style="height: 200px; width: 200px" />
+                    </div>
+                  </div>
+
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Render Video</h5>
+                      <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                        <source src="videos/visual_results/render_videos/010.mp4" type="video/mp4" />
+                      </video>
+                    </div>
+                  </div>
+
+                  <!-- result 11 -->
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Input Image</h5>
+                      <img src="videos/visual_results/input_images/011.png" style="height: 200px; width: 200px" />
+                    </div>
+                  </div>
+
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Render Video</h5>
+                      <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                        <source src="videos/visual_results/render_videos/011.mp4" type="video/mp4" />
+                      </video>
+                    </div>
+                  </div>
+
+                  <!-- result 12 -->
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Input Image</h5>
+                      <img src="videos/visual_results/input_images/012.png" style="height: 200px; width: 200px" />
+                    </div>
+                  </div>
+
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Render Video</h5>
+                      <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                        <source src="videos/visual_results/render_videos/012.mp4" type="video/mp4" />
+                      </video>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="columns is-mobile is-centered">
+            <div class="rows is-mobile is-centered">
+              <div class="row is-mobile is-centered">
+                <div class="columns is-mobile is-centered">
+
+                  <!-- result 13 -->
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Input Image</h5>
+                      <img src="videos/visual_results/input_images/013.png" style="height: 200px; width: 200px" />
+                    </div>
+                  </div>
+
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Render Video</h5>
+                      <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                        <source src="videos/visual_results/render_videos/013.mp4" type="video/mp4" />
+                      </video>
+                    </div>
+                  </div>
+
+                  <!-- result 14 -->
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Input Image</h5>
+                      <img src="videos/visual_results/input_images/014.png" style="height: 200px; width: 200px" />
+                    </div>
+                  </div>
+
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Render Video</h5>
+                      <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                        <source src="videos/visual_results/render_videos/014.mp4" type="video/mp4" />
+                      </video>
+                    </div>
+                  </div>
+
+                  <!-- result 15 -->
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Input Image</h5>
+                      <img src="videos/visual_results/input_images/015.png" style="height: 200px; width: 200px" />
+                    </div>
+                  </div>
+
+                  <div class="column is-mobile is-centered">
+                    <div class="row is-mobile is-centered">
+                      <h5 align="center">Render Video</h5>
+                      <video autoplay controls muted loop playsinline style="height: 200px; width: 200px">
+                        <source src="videos/visual_results/render_videos/015.mp4" type="video/mp4" />
+                      </video>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="columns is-mobile is-centered" style="margin-top: 10px;">
+      <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseOne"
+        href="#collapseOne">
+        More (click again to show less)
+      </button>
+    </div>
+  </section>
+
+  <br /><br />
+
+  <!-- 3.1 Comparison Results Section-->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <h2 class="title is-1">Comparison Results</h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3.2 Comparison Results -->
+  <section class="hero" id="teaser">
+    <div class="container is-max-desktop">
+      <div class="columns is-mobile is-centered">
+        <div class="rows is-mobile is-centered">
+          <div class="row is-mobile is-centered">
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <h5>Reference</h5>
+                <img style="margin-top: 30px;" src="videos/comparison_results/input_images/001.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 6;">
+                <div style="display: flex;">
+                  <h5 align="center" style="flex: 1;">TriplaneGaussian</h5>
+                  <h5 align="center" style="flex: 1;">LGM</h5>
+                  <h5 align="center" style="flex: 1;">DreamGaussian</h5>
+                  <h5 align="center" style="flex: 1;">V3D</h5>
+                  <h5 align="center" style="flex: 1;">Hi3D</h5>
+                  <h5 align="center" style="flex: 1;">Ours</h5>
+                </div>
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/comparison_results/render_videos/001.mp4" type="video/mp4" />
+                </video>
+              </div>
+
+            </div>
+
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 30px;" src="videos/comparison_results/input_images/002.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 6;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/comparison_results/render_videos/002.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 30px;" src="videos/comparison_results/input_images/003.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 6;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/comparison_results/render_videos/003.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 30px;" src="videos/comparison_results/input_images/004.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 6;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/comparison_results/render_videos/004.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="collapseTwo" class="panel-collapse collapse in">
+      <div class="panel-body">
+        <div class="container is-max-desktop">
+          <div class="columns is-mobile is-centered">
+            <div class="rows is-mobile is-centered">
+              <div class="row is-mobile is-centered">
+                <div class="columns is-mobile is-centered">
+                  <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                    <img style="margin-top: 30px;" src="videos/comparison_results/input_images/005.png" />
+                  </div>
+
+                  <div class="column is-mobile is-centered" style="flex: 6;">
+                    <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                      <source src="videos/comparison_results/render_videos/005.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+
+                </div>
+
+                <div class="columns is-mobile is-centered">
+                  <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                    <img style="margin-top: 30px;" src="videos/comparison_results/input_images/006.png" />
+                  </div>
+
+                  <div class="column is-mobile is-centered" style="flex: 6;">
+                    <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                      <source src="videos/comparison_results/render_videos/006.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                </div>
+
+                <div class="columns is-mobile is-centered">
+                  <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                    <img style="margin-top: 30px;" src="videos/comparison_results/input_images/007.png" />
+                  </div>
+
+                  <div class="column is-mobile is-centered" style="flex: 6;">
+                    <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                      <source src="videos/comparison_results/render_videos/007.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                </div>
+
+                <div class="columns is-mobile is-centered">
+                  <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                    <img style="margin-top: 30px;" src="videos/comparison_results/input_images/008.png" />
+                  </div>
+
+                  <div class="column is-mobile is-centered" style="flex: 6;">
+                    <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                      <source src="videos/comparison_results/render_videos/008.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-mobile is-centered" style="margin-top: 10px;">
+      <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseTwo"
+        href="#collapseTwo">
+        More (click again to show less)
+      </button>
+    </div>
+  </section>
+
+  <br /><br />
+
+  <!-- 4.1 Ablation Results Section-->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <h2 class="title is-1">Ablation Results</h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4.2 Ablation Results -->
+  <section class="hero" id="teaser">
+    <div class="container is-max-desktop">
+      <div class="columns is-mobile is-centered">
+        <div class="rows is-mobile is-centered">
+          <div class="row is-mobile is-centered">
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <h5>Reference</h5>
+                <img style="margin-top: 0px;" src="videos/ablation_results/input_images/001.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <div style="display: flex;">
+                  <h5 align="center" style="flex: 1;">Constant Elevations</h5>
+                  <h5 align="center" style="flex: 1;">+Dynamic Elevations</h5>
+                  <h5 align="center" style="flex: 1;">+Progressive Sampling</h5>
+                  <h5 align="center" style="flex: 1;">+Uncertainty-aware Learning</h5>
+                </div>
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results/render_videos/001.mp4" type="video/mp4" />
+                </video>
+              </div>
+
+            </div>
+
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 0px;" src="videos/ablation_results/input_images/002.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results/render_videos/002.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 0px;" src="videos/ablation_results/input_images/003.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results/render_videos/003.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="collapseThree" class="panel-collapse collapse in">
+      <div class="panel-body">
+        <div class="container is-max-desktop">
+          <div class="columns is-mobile is-centered">
+            <div class="rows is-mobile is-centered">
+              <div class="row is-mobile is-centered">
+                <div class="columns is-mobile is-centered">
+                  <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                    <img style="margin-top: 0px;" src="videos/ablation_results/input_images/004.png" />
+                  </div>
+
+                  <div class="column is-mobile is-centered" style="flex: 4;">
+                    <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                      <source src="videos/ablation_results/render_videos/004.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+
+                </div>
+
+                <div class="columns is-mobile is-centered">
+                  <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                    <img style="margin-top: 0px;" src="videos/ablation_results/input_images/005.png" />
+                  </div>
+
+                  <div class="column is-mobile is-centered" style="flex: 4;">
+                    <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                      <source src="videos/ablation_results/render_videos/005.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                </div>
+
+                <div class="columns is-mobile is-centered">
+                  <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                    <img style="margin-top: 0px;" src="videos/ablation_results/input_images/006.png" />
+                  </div>
+
+                  <div class="column is-mobile is-centered" style="flex: 4;">
+                    <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                      <source src="videos/ablation_results/render_videos/006.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-mobile is-centered" style="margin-top: 10px;">
+      <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseThree"
+        href="#collapseThree">
+        More (click again to show less)
+      </button>
+    </div>
+  </section>
+
+  <script type="text/javascript">
+    $(function () {
+      $("#collapseOne").collapse("hide");
+    });
+    $(function () {
+      $("#collapseTwo").collapse("hide");
+    });
+    $(function () {
+      $("#collapseThree").collapse("hide");
+    });
+  </script>
+
+  <br /><br />
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              Website template has been borrowed and modified from
+              <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>
