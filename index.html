@@ -184,7 +184,7 @@
             </h1>
 
             <div class="is-size-2 publication-authors">
-              <span class="author-block">Anonymous Submission</span>
+              <span class="author-block">Jiacheng Wang, Zhedong Zheng, Wei Xu, Ping Liu</span>
             </div>
           </div>
         </div>
@@ -200,26 +200,17 @@
           <h2 class="title is-1">Abstract</h2>
           <div class="content has-text-justified">
             <p>
-              Given a single image of a target object, image-to-3D generation aims to reconstruct its texture and
-              geometric shape.
-              Recent methods often use intermediate media, such as multi-view images or videos, to bridge the input
-              image and the 3D target, guiding the generation of both shape and texture.
-              However, inconsistencies in the generated multi-view snapshots often introduce noise, artifacts, and
-              errors along object boundaries, undermining the 3D reconstruction process.
-              To address this, we leverage 3D Gaussian Splatting (3DGS), a powerful framework for 3D reconstruction, and
-              integrate uncertainty-aware learning into its process.
-              By leveraging the stochasticity between two Gaussian models, we estimate an uncertainty map, which is then
-              used for uncertainty-aware regularization to reduce the impact of inconsistencies.
-              Specifically, we optimize both Gaussian models simultaneously, calculating the uncertainty map by
-              evaluating the differences between rendered images from identical viewpoints.
-              We then apply adaptive pixel-wise loss weighting during training to regularize the models, reducing
-              reconstruction intensity in high-uncertainty regions.
-              This approach dynamically detects and alleviates conflicts in multi-view labels, producing smoother
-              results and effectively mitigating artifacts.
-              Extensive experiments demonstrate the effectiveness of our method in improving 3D generation quality by
-              reducing inconsistencies and artifacts.
+              Image-to-3D generation aims to predict a geometrically and perceptually plausible 3D model from a single 2D image. 
+              Conventional approaches typically follow a cascaded pipeline: first generating multi-view projections from the single input image through view synthesis, followed by optimizing 3D geometry and appearance using these projections. 
+              However, geometric and photometric inconsistencies in the synthesized views destabilize the differentiable rendering optimization, resulting in topologically flawed meshes and perceptually unrealistic material properties, particularly near occluded areas and boundaries.
+              These limitations stem from two critical sources of uncertainty: epistemic uncertainty, arising from incomplete viewpoint coverage, and aleatoric uncertainty, caused by noise and inconsistencies in the generated multi-view frames.
+              To address these challenges, we propose an uncertainty-aware optimization framework that explicitly models and mitigates both uncertainty types.  
+              For epistemic uncertainty, we employ a multiple sampling strategy that dynamically varies camera elevations and progressively integrates diverse viewpoints into training, enhancing viewpoint coverage and stabilizing optimization.  
+              For aleatoric uncertainty, we estimate an uncertainty map from the discrepancies between two independently optimized Gaussian models. 
+              This map is incorporated into uncertainty-aware regularization, dynamically adjusting loss weights to suppress unreliable supervision.  
+              Furthermore, we provide a theoretical analysis of uncertainty-aware optimization by deriving a probabilistic upper bound on the expected generation error, providing insights into its effectiveness. 
+              Extensive experiments demonstrate that our method significantly reduces artifacts and inconsistencies, leading to higher-quality 3D generation.
             </p>
-
             <br />
           </div>
         </div>
@@ -745,7 +736,15 @@
     </div>
   </section>
 
-  <!-- 4.2 Ablation Results -->
+  <!-- 4.2 Ablation Results Section 1-->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <h2 class="title is-3">Impact of Multiple Sampling</h2>
+      </div>
+    </div>
+  </section>
+
   <section class="hero" id="teaser">
     <div class="container is-max-desktop">
       <div class="columns is-mobile is-centered">
@@ -754,18 +753,18 @@
             <div class="columns is-mobile is-centered">
               <div class="column is-mobile is-centered" align="center" style="flex: 1;">
                 <h5>Reference</h5>
-                <img style="margin-top: 0px;" src="videos/ablation_results/input_images/001.png" />
+                <img style="margin-top: 0px;" src="videos/ablation_results_1/input_images/001.png" />
               </div>
 
               <div class="column is-mobile is-centered" style="flex: 4;">
                 <div style="display: flex;">
                   <h5 align="center" style="flex: 1;">Constant Elevations</h5>
                   <h5 align="center" style="flex: 1;">+Dynamic Elevations</h5>
+                  <h5 align="center" style="flex: 1;">+Multiple Frames</h5>
                   <h5 align="center" style="flex: 1;">+Progressive Sampling</h5>
-                  <h5 align="center" style="flex: 1;">+Uncertainty-aware Learning</h5>
                 </div>
                 <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
-                  <source src="videos/ablation_results/render_videos/001.mp4" type="video/mp4" />
+                  <source src="videos/ablation_results_1/render_videos/001.mp4" type="video/mp4" />
                 </video>
               </div>
 
@@ -773,24 +772,109 @@
 
             <div class="columns is-mobile is-centered">
               <div class="column is-mobile is-centered" align="center" style="flex: 1;">
-                <img style="margin-top: 0px;" src="videos/ablation_results/input_images/002.png" />
+                <img style="margin-top: 0px;" src="videos/ablation_results_1/input_images/002.png" />
               </div>
 
               <div class="column is-mobile is-centered" style="flex: 4;">
                 <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
-                  <source src="videos/ablation_results/render_videos/002.mp4" type="video/mp4" />
+                  <source src="videos/ablation_results_1/render_videos/002.mp4" type="video/mp4" />
                 </video>
               </div>
             </div>
 
             <div class="columns is-mobile is-centered">
               <div class="column is-mobile is-centered" align="center" style="flex: 1;">
-                <img style="margin-top: 0px;" src="videos/ablation_results/input_images/003.png" />
+                <img style="margin-top: 0px;" src="videos/ablation_results_1/input_images/003.png" />
               </div>
 
               <div class="column is-mobile is-centered" style="flex: 4;">
                 <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
-                  <source src="videos/ablation_results/render_videos/003.mp4" type="video/mp4" />
+                  <source src="videos/ablation_results_1/render_videos/003.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 0px;" src="videos/ablation_results_1/input_images/004.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results_1/render_videos/004.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+
+  <!-- 4.2 Ablation Results Section 2-->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <h2 class="title is-3">Design of Uncertainty Estimation</h2>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero" id="teaser">
+    <div class="container is-max-desktop">
+      <div class="columns is-mobile is-centered">
+        <div class="rows is-mobile is-centered">
+          <div class="row is-mobile is-centered">
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <h5>Reference</h5>
+                <img style="margin-top: 0px;" src="videos/ablation_results_2/input_images/001.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <div style="display: flex;">
+                  <h5 align="center" style="flex: 1;">w/o Uncertainty</h5>
+                  <h5 align="center" style="flex: 1;">Learnable Uncertainty</h5>
+                  <h5 align="center" style="flex: 1;">Ensemble Uncertainty</h5>
+                  <h5 align="center" style="flex: 1;">Ours</h5>
+                </div>
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results_2/render_videos/001.mp4" type="video/mp4" />
+                </video>
+              </div>
+
+            </div>
+
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 0px;" src="videos/ablation_results_2/input_images/002.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results_2/render_videos/002.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 0px;" src="videos/ablation_results_2/input_images/003.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results_2/render_videos/003.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 0px;" src="videos/ablation_results_2/input_images/004.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results_2/render_videos/004.mp4" type="video/mp4" />
                 </video>
               </div>
             </div>
@@ -799,48 +883,73 @@
       </div>
     </div>
 
-    <div id="collapseThree" class="panel-collapse collapse in">
-      <div class="panel-body">
-        <div class="container is-max-desktop">
-          <div class="columns is-mobile is-centered">
-            <div class="rows is-mobile is-centered">
-              <div class="row is-mobile is-centered">
-                <div class="columns is-mobile is-centered">
-                  <div class="column is-mobile is-centered" align="center" style="flex: 1;">
-                    <img style="margin-top: 0px;" src="videos/ablation_results/input_images/004.png" />
-                  </div>
+    
+  <!-- 4.4 Ablation Results Section 3-->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <h2 class="title is-3">Impact of the Uncertainty Regularization Weight</h2>
+      </div>
+    </div>
+  </section>
 
-                  <div class="column is-mobile is-centered" style="flex: 4;">
-                    <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
-                      <source src="videos/ablation_results/render_videos/004.mp4" type="video/mp4" />
-                    </video>
-                  </div>
+  <section class="hero" id="teaser">
+    <div class="container is-max-desktop">
+      <div class="columns is-mobile is-centered">
+        <div class="rows is-mobile is-centered">
+          <div class="row is-mobile is-centered">
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <h5>Reference</h5>
+                <img style="margin-top: 0px;" src="videos/ablation_results_3/input_images/001.png" />
+              </div>
 
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <div style="display: flex;">
+                  <h5 align="center" style="flex: 1;">λ=0</h5>
+                  <h5 align="center" style="flex: 1;">λ=1</h5>
+                  <h5 align="center" style="flex: 1;">λ=5</h5>
+                  <h5 align="center" style="flex: 1;">λ=10</h5>
                 </div>
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results_3/render_videos/001.mp4" type="video/mp4" />
+                </video>
+              </div>
 
-                <div class="columns is-mobile is-centered">
-                  <div class="column is-mobile is-centered" align="center" style="flex: 1;">
-                    <img style="margin-top: 0px;" src="videos/ablation_results/input_images/005.png" />
-                  </div>
+            </div>
 
-                  <div class="column is-mobile is-centered" style="flex: 4;">
-                    <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
-                      <source src="videos/ablation_results/render_videos/005.mp4" type="video/mp4" />
-                    </video>
-                  </div>
-                </div>
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 0px;" src="videos/ablation_results_3/input_images/002.png" />
+              </div>
 
-                <div class="columns is-mobile is-centered">
-                  <div class="column is-mobile is-centered" align="center" style="flex: 1;">
-                    <img style="margin-top: 0px;" src="videos/ablation_results/input_images/006.png" />
-                  </div>
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results_3/render_videos/002.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
 
-                  <div class="column is-mobile is-centered" style="flex: 4;">
-                    <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
-                      <source src="videos/ablation_results/render_videos/006.mp4" type="video/mp4" />
-                    </video>
-                  </div>
-                </div>
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 0px;" src="videos/ablation_results_3/input_images/003.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results_3/render_videos/003.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+            <div class="columns is-mobile is-centered">
+              <div class="column is-mobile is-centered" align="center" style="flex: 1;">
+                <img style="margin-top: 0px;" src="videos/ablation_results_3/input_images/004.png" />
+              </div>
+
+              <div class="column is-mobile is-centered" style="flex: 4;">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                  <source src="videos/ablation_results_3/render_videos/004.mp4" type="video/mp4" />
+                </video>
               </div>
             </div>
           </div>
@@ -848,12 +957,7 @@
       </div>
     </div>
 
-    <div class="columns is-mobile is-centered" style="margin-top: 10px;">
-      <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseThree"
-        href="#collapseThree">
-        More (click again to show less)
-      </button>
-    </div>
+
   </section>
 
   <script type="text/javascript">
