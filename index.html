@@ -201,12 +201,11 @@
           <div class="content has-text-justified">
             <p>
               Image-to-3D generation aims to predict a geometrically and perceptually plausible 3D model from a single 2D image. 
-              Conventional approaches typically follow a cascaded pipeline: first generating multi-view projections from the single input image through view synthesis, followed by optimizing 3D geometry and appearance using these projections. 
-              However, geometric and photometric inconsistencies in the synthesized views destabilize the differentiable rendering optimization, resulting in topologically flawed meshes and perceptually unrealistic material properties, particularly near occluded areas and boundaries.
-              These limitations stem from two critical sources of uncertainty: epistemic uncertainty, arising from incomplete viewpoint coverage, and aleatoric uncertainty, caused by noise and inconsistencies in the generated multi-view frames.
-              To address these challenges, we propose an uncertainty-aware optimization framework that explicitly models and mitigates both uncertainty types.  
-              For epistemic uncertainty, we employ a multiple sampling strategy that dynamically varies camera elevations and progressively integrates diverse viewpoints into training, enhancing viewpoint coverage and stabilizing optimization.  
-              For aleatoric uncertainty, we estimate an uncertainty map from the discrepancies between two independently optimized Gaussian models. 
+              Conventional approaches typically follow a cascaded pipeline: initially generating multi-view projections from the single input image through view synthesis, followed by optimizing 3D geometry and appearance strictly using these projections. 
+              However, such deterministic optimization neglects epistemic uncertainty from imperfectly generated data, particularly due to limited observations and inconsistent content.
+              To address this issue, we propose an uncertainty-aware optimization framework that explicitly models and mitigates epistemic uncertainty, leading to more robust and reliable 3D generation.
+              For epistemic uncertainty arising from incomplete viewpoint coverage, we employ a progressive sampling strategy that dynamically varies camera elevations and progressively integrates diverse viewpoints into training, enhancing viewpoint coverage and stabilizing optimization.  
+              For epistemic uncertainty caused by the deterministic optimization on the noisy and inconsistent generated multi-view frames, we estimate an uncertainty map from the discrepancies between two independently optimized Gaussian models. 
               This map is incorporated into uncertainty-aware regularization, dynamically adjusting loss weights to suppress unreliable supervision.  
               Furthermore, we provide a theoretical analysis of uncertainty-aware optimization by deriving a probabilistic upper bound on the expected generation error, providing insights into its effectiveness. 
               Extensive experiments demonstrate that our method significantly reduces artifacts and inconsistencies, leading to higher-quality 3D generation.
@@ -229,15 +228,10 @@
       </div>
       <div class="content has-text-justified">
         <p>
-          Overview of the RIGI pipeline, which takes a reference image as input and produces 3D assets as output.
-          We adopt a two-stage approach, first using a multi-view video diffusion model to generate dense and
-          high-quality frames, which are then served as pseudo-labels to guide 3D asset optimization.
-          Specifically, we first use SV3D to generate multiple videos with a wide range of viewpoints, which serve as
-          pseudo-labels for 3D asset optimization.
-          Next, we introduce uncertainty-aware learning, estimating an uncertainty map by leveraging the stochasticity
-          of two simultaneously optimized Gaussian models.
-          Finally, we apply uncertainty-aware regularization to mitigate the impact of inconsistencies in the generated
-          pseudo-labels, resulting in high-quality and visually impressive 3D assets.
+          Our method consists of two main components: (a) Progressive Sampling, where we first employ a multi-view diffusion model (SV3D) to generate multi-view frames from diverse viewpoints, progressively integrating these pseudo labels into the training process. This strategy mitigates epistemic uncertainty caused by limited observations, enhancing viewpoint coverage. 
+          (b) Uncertainty-aware Learning, where we independently optimize two Gaussian models and estimate an uncertainty map from their discrepancies. 
+          This uncertainty map captures epistemic uncertainty arising from ambiguous interpretations of inconsistent pseudo labels. 
+          Finally, we employ uncertainty-aware regularization to dynamically suppress unreliable supervision signals, effectively resolving inconsistencies and producing high-quality, visually coherent 3D assets.
         </p>
       </div>
     </div>
@@ -760,10 +754,9 @@
                 <div style="display: flex;">
                   <h5 align="center" style="flex: 1;">Constant Elevations</h5>
                   <h5 align="center" style="flex: 1;">+Dynamic Elevations</h5>
-                  <h5 align="center" style="flex: 1;">+Multiple Frames</h5>
-                  <h5 align="center" style="flex: 1;">+Progressive Sampling</h5>
+                  <h5 align="center" style="flex: 1;">+Progressive Learning</h5>
                 </div>
-                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 900px">
                   <source src="videos/ablation_results_1/render_videos/001.mp4" type="video/mp4" />
                 </video>
               </div>
@@ -776,7 +769,7 @@
               </div>
 
               <div class="column is-mobile is-centered" style="flex: 4;">
-                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 900px">
                   <source src="videos/ablation_results_1/render_videos/002.mp4" type="video/mp4" />
                 </video>
               </div>
@@ -788,7 +781,7 @@
               </div>
 
               <div class="column is-mobile is-centered" style="flex: 4;">
-                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 900px">
                   <source src="videos/ablation_results_1/render_videos/003.mp4" type="video/mp4" />
                 </video>
               </div>
@@ -799,7 +792,7 @@
               </div>
 
               <div class="column is-mobile is-centered" style="flex: 4;">
-                <video autoplay controls muted loop playsinline style="height: 200px; width: 1200px">
+                <video autoplay controls muted loop playsinline style="height: 200px; width: 900px">
                   <source src="videos/ablation_results_1/render_videos/004.mp4" type="video/mp4" />
                 </video>
               </div>
